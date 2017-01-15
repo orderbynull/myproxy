@@ -23,9 +23,7 @@ func handleConnection(conn net.Conn) {
 	}
 
 	go io.Copy(conn, mysql)
-	//io.Copy(mysql, conn)
 	appToMysql(conn, mysql)
-
 }
 
 func main() {
