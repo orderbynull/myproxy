@@ -5,22 +5,23 @@ import (
 	"log"
 	"net"
 	dbms "github.com/orderbynull/myproxy/mysql"
+	"fmt"
 )
 
 const MYSQL = "127.0.0.1:3306"
-const PROXY = "127.0.0.1:3305"
-
-const COM_QUERY = 3
-const COM_STMT_PREPARE = 22
+const PROXY = "127.0.0.1:4040"
 
 func appToMysql(app net.Conn, mysql net.Conn) {
 	for{
-		_, err := dbms.ProxyPacket(app, mysql)
+		pkt, err := dbms.ProxyPacket(app, mysql)
 		if err != nil{
 			break
 		}
-	}
 
+		if query, err := dbms.GetQueryString(pkt); err == nil{
+			fmt.Printf("> %s \n\n", query)
+		}
+	}
 }
 
 func handleConnection(conn net.Conn) {

@@ -6,8 +6,14 @@ import (
 	"errors"
 )
 
+const (
+	COM_QUERY = 3
+	COM_STMT_PREPARE = 22
+)
+
 //Заранее определим возможные ошибки
 var ErrWritePacket = errors.New("error while writing packet payload")
+var ErrNoQueryPacket = errors.New("malformed packet")
 
 func ReadPacket(conn net.Conn) ([]byte, error) {
 	header := []byte{0, 0, 0, 0}
@@ -53,4 +59,16 @@ func ProxyPacket(src, dst net.Conn) ([]byte, error) {
 	}
 
 	return pkt, nil
+}
+
+func CanGetQueryString(pkt []byte) bool{
+	return len(pkt) > 5 && (pkt[4] == COM_QUERY || pkt[4] == COM_STMT_PREPARE)
+}
+
+func GetQueryString(pkt []byte) (string, error){
+	if CanGetQueryString(pkt){
+		return string(pkt[5:]), nil
+	}
+
+	return "", ErrNoQueryPacket
 }
