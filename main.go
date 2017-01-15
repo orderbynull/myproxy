@@ -9,6 +9,10 @@ import (
 const MYSQL = "127.0.0.1:3306"
 const PROXY = "127.0.0.1:3305"
 
+func appToMysql (app net.Conn, mysql net.Conn){
+	io.Copy(mysql, app)
+}
+
 func handleConnection(conn net.Conn) {
 	defer conn.Close()
 
@@ -19,7 +23,8 @@ func handleConnection(conn net.Conn) {
 	}
 
 	go io.Copy(conn, mysql)
-	io.Copy(mysql, conn)
+	//io.Copy(mysql, conn)
+	appToMysql(conn, mysql)
 
 }
 
