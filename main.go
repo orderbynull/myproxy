@@ -1,24 +1,27 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net"
+
 	dbms "github.com/orderbynull/myproxy/mysql"
-	"fmt"
 )
 
-const MYSQL = "127.0.0.1:3306"
-const PROXY = "127.0.0.1:4040"
+const (
+	MYSQL = "127.0.0.1:3306"
+	PROXY = "127.0.0.1:3305"
+)
 
 func appToMysql(app net.Conn, mysql net.Conn) {
-	for{
+	for {
 		pkt, err := dbms.ProxyPacket(app, mysql)
-		if err != nil{
+		if err != nil {
 			break
 		}
 
-		if query, err := dbms.GetQueryString(pkt); err == nil{
+		if query, err := dbms.GetQueryString(pkt); err == nil {
 			fmt.Printf("> %s \n\n", query)
 		}
 	}
